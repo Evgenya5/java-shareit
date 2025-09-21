@@ -1,15 +1,11 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.item.repository;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Component
 @Qualifier("inMemoryItemRepository")
 public class InMemoryItemRepository implements ItemRepository {
@@ -28,7 +24,8 @@ public class InMemoryItemRepository implements ItemRepository {
         if (text.isBlank()) {
             return List.of();
         }
-        return items.values().stream().filter(item -> (item.getDescription().toUpperCase().contains(text.toUpperCase()) || item.getName().toUpperCase().contains(text.toUpperCase())) && item.getAvailable().equals("true")).toList();
+        return items.values().stream().filter(item -> (item.getDescription().toUpperCase().contains(text.toUpperCase())
+                || item.getName().toUpperCase().contains(text.toUpperCase())) && item.getAvailable()).toList();
     }
 
     @Override
@@ -42,18 +39,12 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     @Override
-    public Item findById(Long id) {
-
-        return Optional.ofNullable(items.get(id)).orElseThrow(() ->
-                new NotFoundException("Вещь с id = " + id + " не найден"));
+    public Optional<Item> findById(Long id) {
+        return Optional.ofNullable(items.get(id));
     }
 
     @Override
     public Item update(Item newItem) {
-        Optional.ofNullable(newItem).orElseThrow(() ->
-                new NotFoundException("Вещь пустая"));
-        Optional.ofNullable(items.get(newItem.getId())).orElseThrow(() ->
-                new NotFoundException("Вещь с id " + newItem.getId() + " не найдена"));
         return items.replace(newItem.getId(), newItem);
     }
 }

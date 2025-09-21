@@ -1,8 +1,9 @@
-package ru.practicum.shareit.user.dto;
+package ru.practicum.shareit.user.repository;
 
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface UserRepository {
     Collection<User> findAll();
@@ -13,7 +14,7 @@ public interface UserRepository {
 
     void delete(Long id);
 
-    User findById(long id);
+    Optional<User> findById(long id);
 
     boolean checkDuplicateEmail(String email);
 }

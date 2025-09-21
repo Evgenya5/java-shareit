@@ -1,72 +1,69 @@
 package ru.practicum.shareit.user;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidateEmailException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.user.dto.UserRepository;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserMapper;
+import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.model.User;
+
 import java.util.Collection;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
 
-    @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserDto findById(long userId) {
+        return UserMapper.toUserDto(userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("Пользователь с id = " + userId + " не найден")));
     }
 
-    public User findById(long userId) {
-        return userRepository.findById(userId);
+    public Collection<UserDto> findAll() {
+        return userRepository.findAll().stream().map(UserMapper::toUserDto).toList();
     }
 
-    public Collection<User> findAll() {
-        return userRepository.findAll();
-    }
+    public UserDto create(UserDto userDto) {
 
-    public User create(User user) {
-        // проверяем выполнение необходимых условий
-        validateUser(user);
         // формируем дополнительные данные
-        user.setId(getNextId());
-        userRepository.create(user);
-        log.debug("create user with id: {}", user.getId());
-        return user;
+        if (userRepository.checkDuplicateEmail(userDto.getEmail())) {
+            throw new ValidateEmailException("электронная почта уже зарегистрирована");
+        }
+        userDto.setId(getNextId());
+        userRepository.create(UserMapper.toUser(userDto));
+        log.debug("create user with id: {}", userDto.getId());
+        return userDto;
     }
 
-    public User update(Long userId, User user) {
-        if (user == null || userId == null) {
-            log.error("user id empty");
-            throw new ValidationException("Id должен быть указан");
-        }
+    public UserDto update(Long userId, UserDto userDto) {
 
-        User oldUser = userRepository.findById(userId);
+        User oldUser = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("Пользователь с id = " + userId + " не найден"));
         // если найдена и все условия соблюдены, обновляем её содержимое
 
-        if (user.getEmail() != null) {
-            if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
+        if (userDto.getEmail() != null) {
+            if (userDto.getEmail().isBlank() || !userDto.getEmail().contains("@")) {
                 log.error("not valid email");
                 throw new ValidationException("электронная почта не может быть пустой и должна содержать символ @");
-            } else if (userRepository.checkDuplicateEmail(user.getEmail())) {
+            } else if (userRepository.checkDuplicateEmail(userDto.getEmail())) {
                 throw new ValidateEmailException("электронная почта уже зарегистрирована");
             }
-                oldUser.setEmail(user.getEmail());
+            oldUser.setEmail(userDto.getEmail());
         }
-        if (user.getName() != null && !user.getName().isBlank()) {
-            oldUser.setName(user.getName());
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            oldUser.setName(userDto.getName());
         }
         log.debug("update user with id: {}", oldUser.getId());
         userRepository.update(oldUser);
-        return oldUser;
+        return UserMapper.toUserDto(oldUser);
     }
 
     public void delete(Long userId) {
-        if (userId == null) {
-            log.error("user id empty");
-            throw new ValidationException("Id должен быть указан");
-        }
         userRepository.delete(userId);
     }
 
@@ -77,15 +74,5 @@ public class UserService {
                 .max()
                 .orElse(0);
         return ++currentMaxId;
-    }
-
-    private void validateUser(User user) {
-
-        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            log.error("empty email");
-            throw new ValidationException("электронная почта не может быть пустой и должна содержать символ @");
-        } else if (userRepository.checkDuplicateEmail(user.getEmail())) {
-            throw new ValidateEmailException("электронная почта уже зарегистрирована");
-        }
     }
 }

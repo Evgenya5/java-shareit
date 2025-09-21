@@ -1,9 +1,8 @@
-package ru.practicum.shareit.user.dto;
+package ru.practicum.shareit.user.repository;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
 
@@ -13,9 +12,8 @@ public class InMemoryUserRepository implements UserRepository {
     private final Map<Long, User> users = new HashMap<>();
 
     @Override
-    public User findById(long id) {
-        return Optional.ofNullable(users.get(id)).orElseThrow(() ->
-                new NotFoundException("Пользователь с id = " + id + " не найден"));
+    public Optional<User> findById(long id) {
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
@@ -40,10 +38,6 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public User update(User user) {
-        Optional.ofNullable(user).orElseThrow(() ->
-                new NotFoundException("Пользователь пустой"));
-        Optional.ofNullable(users.get(user.getId())).orElseThrow(() ->
-                new NotFoundException("Пользователь с id " + user.getId() + " не найден"));
         return users.replace(user.getId(), user);
     }
 

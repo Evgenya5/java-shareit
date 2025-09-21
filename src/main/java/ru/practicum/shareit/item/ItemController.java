@@ -1,47 +1,43 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.Collection;
 
-/**
- * TODO Sprint add-controllers.
- */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/items")
+@Validated
 public class ItemController {
     private final ItemService itemService;
 
-    @Autowired
-    public ItemController(ItemService itemService) {
-        this.itemService = itemService;
-    }
-
     @GetMapping
-    public Collection<Item> findAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public Collection<ItemDto> findAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.findAll(userId);
     }
 
     @GetMapping("/{id}")
-    public Item findById(@PathVariable Long id) {
+    public ItemDto findById(@PathVariable Long id) {
         return itemService.findById(id);
     }
 
     @GetMapping("/search")
-    public Collection<Item> searchByText(@RequestParam String text) {
+    public Collection<ItemDto> searchByText(@RequestParam String text) {
         return itemService.searchByText(text);
     }
 
     @PostMapping
-    public Item create(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody Item item) {
-        return itemService.create(userId, item);
+    public ItemDto create(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @RequestBody ItemDto itemDto) {
+        return itemService.create(userId, itemDto);
     }
 
     @PatchMapping("/{id}")
-    public Item update(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long id, @RequestBody Item item) {
-        return itemService.update(id, item, userId);
+    public ItemDto update(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long id, @RequestBody ItemDto itemDto) {
+        return itemService.update(id, itemDto, userId);
     }
 
     @DeleteMapping("/{id}")
