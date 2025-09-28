@@ -1,0 +1,4 @@
+2025-09-28 21:43:09.147858+03:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Синтаксическая ошибка в выражении SQL "select b from bookings as bjoin [*]items as it on it.id = b.item_id join users as us on us.id = it.owner_id where us.id = ?"
+Syntax error in SQL statement "select b from bookings as bjoin [*]items as it on it.id = b.item_id join users as us on us.id = it.owner_id where us.id = ?"; SQL statement:
+select b from bookings as bjoin items as it on it.id = b.item_id join users as us on us.id = it.owner_id where us.id = ? [42000-224]
