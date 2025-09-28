@@ -8,7 +8,10 @@ public class ItemMapper {
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getAvailable()
+                item.getAvailable(),
+                item.getComments(),
+                null,
+                null
         );
     }
 
@@ -19,7 +22,8 @@ public class ItemMapper {
                 itemDto.getDescription(),
                 itemDto.getAvailable(),
                 userId,
-                ""
+                "",
+                itemDto.getComments()
         );
     }
 }

@@ -1,35 +1,59 @@
 package ru.practicum.shareit.item;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.comment.CommentRepository;
+import ru.practicum.shareit.comment.dto.CommentDto;
+import ru.practicum.shareit.comment.dto.CommentMapper;
+import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ItemService {
-    private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
+    @Autowired
+    private ItemRepository itemRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private CommentRepository commentRepository;
+    @Autowired
+    private BookingRepository bookingRepository;
 
     public ItemDto create(Long userId, ItemDto itemDto) {
 
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
-        // формируем дополнительные данные
-        itemDto.setId(getNextId());
-        Item item = ItemMapper.toItem(itemDto,userId);
-        itemRepository.create(item);
-        log.debug("create item with id: {}", item.getId());
-        return ItemMapper.toItemDto(item);
+        Item item = ItemMapper.toItem(itemDto, userId);
+        return ItemMapper.toItemDto(itemRepository.save(item));
+    }
+
+    public CommentDto createComment(Long userId, Long id, CommentDto commentDto) {
+
+        User author = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("Пользователь с id = " + userId + " не найден"));
+        itemRepository.findById(id).orElseThrow(() ->
+                new NotFoundException("Вещь с id = " + id + " не найдена"));
+        if (bookingRepository.findByBooker_IdAndItem_IdAndEndIsBefore(userId, id, Instant.parse(LocalDateTime.now().toString() + "Z")).isEmpty()) {
+            throw new ValidationException("Пользователь не имеет законченных бронирований данной вещи");
+        }
+        commentDto.setItemId(id);
+        commentDto.setAuthorId(userId);
+        Comment comment = commentRepository.save(CommentMapper.toComment(commentDto, author));
+        return CommentMapper.toCommentDto(comment);
     }
 
     public void delete(Long itemId) {
@@ -37,11 +61,11 @@ public class ItemService {
             log.error("user id empty");
             throw new ValidationException("Id должен быть указан");
         }
-        itemRepository.delete(itemId);
+        itemRepository.delete(itemRepository.findById(itemId).get());
     }
 
     public Collection<ItemDto> findAll(Long userId) {
-        return itemRepository.findAll(userId).stream().map(ItemMapper::toItemDto).toList();
+        return itemRepository.findByOwner(userId).stream().map(ItemMapper::toItemDto).toList();
     }
 
     public ItemDto findById(Long id) {
@@ -50,13 +74,14 @@ public class ItemService {
     }
 
     public Collection<ItemDto> searchByText(String text) {
-        return itemRepository.searchByText(text).stream().map(ItemMapper::toItemDto).toList();
+        return itemRepository.findByText(text).stream().map(ItemMapper::toItemDto).toList();
     }
 
     public ItemDto update(Long id, ItemDto itemDto, Long userId) {
 
         Item oldItem = itemRepository.findById(id).orElseThrow(() ->
-                new NotFoundException("Вещь с id = " + id + " не найден"));;
+                new NotFoundException("Вещь с id = " + id + " не найден"));
+        ;
         if (itemDto.getName() != null) {
             oldItem.setName(itemDto.getName());
         }
@@ -71,15 +96,6 @@ public class ItemService {
                     new NotFoundException("Пользователь с id = " + userId + " не найден"));
             oldItem.setOwner(userId);
         }
-        return ItemMapper.toItemDto(itemRepository.update(oldItem));
-    }
-
-    private long getNextId() {
-        long currentMaxId = itemRepository.findAll(null)
-                .stream()
-                .mapToLong(Item::getId)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+        return ItemMapper.toItemDto(itemRepository.save(oldItem));
     }
 }

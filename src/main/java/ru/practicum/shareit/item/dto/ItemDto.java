@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder(toBuilder = true)
@@ -22,4 +24,8 @@ public class ItemDto {
 
     @NotNull
     private Boolean available;
+
+    private Set<String> comments = new HashSet<>();
+    private Long lastBooking;
+    private Long nextBooking;
 }
