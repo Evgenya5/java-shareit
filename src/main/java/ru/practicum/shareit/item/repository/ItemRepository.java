@@ -8,7 +8,9 @@ import java.util.List;
 
 @EnableJpaRepositories
 public interface ItemRepository extends JpaRepository<Item,Long> {
+
     @Query("select it from Item as it where (upper(it.description) like upper(?1) or upper(it.name) like upper(?1)) and it.available")
     List<Item> findByText(String textSearch);
+
     List<Item> findByOwner(Long ownerId);
 }
