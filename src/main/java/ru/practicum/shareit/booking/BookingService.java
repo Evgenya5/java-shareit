@@ -45,6 +45,8 @@ public class BookingService {
 
     public Collection<BookingDto> findAllByBooker(Long userId, String stateStr) {
         BookingState bookingState = BookingState.valueOf(stateStr);
+        userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("Пользователь с id = " + userId + " не найден"));
         switch (bookingState) {
             case ALL -> {
                 return bookingRepository.findByBooker_IdOrderByStartDesc(userId).stream().map(BookingMapper::toBookingDto).toList();
@@ -77,6 +79,8 @@ public class BookingService {
 
     public Collection<BookingDto> findAllByOwner(Long userId, String stateStr) {
         BookingState bookingState = BookingState.valueOf(stateStr);
+        userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("Пользователь с id = " + userId + " не найден"));
         switch (bookingState) {
             case ALL -> {
                 return bookingRepository.findByOwner_IdOrderByStartDesc(userId).stream().map(BookingMapper::toBookingDto).toList();
