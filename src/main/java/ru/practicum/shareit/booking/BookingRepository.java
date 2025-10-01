@@ -37,7 +37,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "where b.start_date >= ?2 " +
             "order by b.start_date desc", nativeQuery = true)
     List<Booking> findByOwner_IdAndStartIsAfterOrderByStartDesc(Long ownerId, LocalDateTime start);
-    
+
     @Query(value = "select b.* from bookings as b " +
             "join items as it on it.id = b.item_id " +
             "and it.owner_id = ?1 " +
