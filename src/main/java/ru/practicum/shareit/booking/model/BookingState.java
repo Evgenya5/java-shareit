@@ -3,17 +3,17 @@ package ru.practicum.shareit.booking.model;
 import lombok.Getter;
 
 @Getter
-public enum State {
+public enum BookingState {
     ALL("Все"),
     CURRENT("Текущие"),
     PAST("Завершенные"),
-    FUTURE("Будушие"),
-    REJECTED("Ожидабщие подтверждения"),
+    FUTURE("Будущие"),
+    REJECTED("Ожидающие подтверждения"),
     WAITING("Отклоненные");
 
     private final String description;
 
-    State(String description) {
+    BookingState(String description) {
         this.description = description;
     }
 }

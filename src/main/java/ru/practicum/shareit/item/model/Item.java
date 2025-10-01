@@ -2,8 +2,6 @@ package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -24,8 +22,4 @@ public class Item {
     private Long owner;
     @Column(name = "request_id")
     private String request;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "comments", joinColumns = @JoinColumn(name = "item_id"))
-    @Column(name = "text")
-    private Set<String> comments = new HashSet<>();
 }

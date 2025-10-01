@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,13 +17,12 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ItemService {
     @Autowired
     private ItemRepository itemRepository;
@@ -47,7 +47,7 @@ public class ItemService {
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
         itemRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Вещь с id = " + id + " не найдена"));
-        if (bookingRepository.findByBooker_IdAndItem_IdAndEndIsBefore(userId, id, Instant.parse(LocalDateTime.now().toString() + "Z")).isEmpty()) {
+        if (bookingRepository.findByBooker_IdAndItem_IdAndEndIsBefore(userId, id, LocalDateTime.now()).isEmpty()) {
             throw new ValidationException("Пользователь не имеет законченных бронирований данной вещи");
         }
         commentDto.setItemId(id);
@@ -69,8 +69,10 @@ public class ItemService {
     }
 
     public ItemDto findById(Long id) {
-        return ItemMapper.toItemDto(itemRepository.findById(id).orElseThrow(() ->
+        ItemDto itemDto = ItemMapper.toItemDto(itemRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Вещь с id = " + id + " не найден")));
+        itemDto.setComments(commentRepository.findByItemId(id).stream().map(Comment::getText).toList());
+        return itemDto;
     }
 
     public Collection<ItemDto> searchByText(String text) {
@@ -81,7 +83,6 @@ public class ItemService {
 
         Item oldItem = itemRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Вещь с id = " + id + " не найден"));
-        ;
         if (itemDto.getName() != null) {
             oldItem.setName(itemDto.getName());
         }

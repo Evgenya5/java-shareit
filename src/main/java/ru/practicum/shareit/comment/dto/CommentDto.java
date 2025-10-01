@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentDto {
-    Long id;
+    private Long id;
     @NotBlank(message = "text не может быть пустым")
-    String text;
-    Long itemId;
-    String authorName;
-    Long authorId;
-    String created;
+    private String text;
+    private Long itemId;
+    private String authorName;
+    private Long authorId;
+    private String created;
 }

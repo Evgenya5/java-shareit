@@ -1,15 +1,18 @@
 package ru.practicum.shareit.booking.dto;
 
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.Status;
-import java.time.Instant;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class BookingMapper {
+    private static final DateTimeFormatter dateTimeFormater = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
     public static BookingDto toBookingDto(Booking booking) {
         return new BookingDto(
                 booking.getId(),
-                booking.getStart().toString().substring(0, booking.getStart().toString().length() - 1),
-                booking.getEnd().toString().substring(0, booking.getEnd().toString().length() - 1),
+                booking.getStart().format(dateTimeFormater),
+                booking.getEnd().format(dateTimeFormater),
                 booking.getItem().getId(),
                 booking.getItem(),
                 booking.getBooker(),
@@ -18,17 +21,18 @@ public class BookingMapper {
     }
 
     public static Booking toBooking(BookingDto bookingDto) {
-        Status status = Status.WAITING;
+        BookingStatus bookingStatus = BookingStatus.WAITING;
+
         if (bookingDto.getStatus() != null) {
-            status = bookingDto.getStatus();
+            bookingStatus = bookingDto.getStatus();
         }
         return new Booking(
                 bookingDto.getId(),
-                Instant.parse(bookingDto.getStart() + "Z"),
-                Instant.parse(bookingDto.getEnd() + "Z"),
+                LocalDateTime.parse(bookingDto.getStart(), dateTimeFormater),
+                LocalDateTime.parse(bookingDto.getEnd(), dateTimeFormater),
                 bookingDto.getItem(),
                 bookingDto.getBooker(),
-                status
+                bookingStatus
         );
     }
 }

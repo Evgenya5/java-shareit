@@ -2,7 +2,7 @@ package ru.practicum.shareit.booking.model;
 import lombok.Getter;
 
 @Getter
-public enum Status {
+public enum BookingStatus {
     WAITING("Новое бронирование, ожидает одобрения"),
     APPROVED("Бронирование подтверждено владельцем"),
     REJECTED("Бронирование отклонено владельцем"),
@@ -10,7 +10,7 @@ public enum Status {
 
     private final String description;
 
-    Status(String description) {
+    BookingStatus(String description) {
         this.description = description;
     }
 }
