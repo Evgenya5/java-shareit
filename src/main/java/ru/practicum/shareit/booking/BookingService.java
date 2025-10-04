@@ -2,10 +2,10 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
+import ru.practicum.shareit.booking.dto.CreateBookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -20,17 +20,16 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookingService {
-    @Autowired
-    private BookingRepository bookingRepository;
-    @Autowired
-    private ItemRepository itemRepository;
-    @Autowired
-    private UserRepository userRepository;
+
+    private final BookingRepository bookingRepository;
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
 
     public BookingDto findById(Long userId, Long id) {
         Booking booking = bookingRepository.findById(id).orElseThrow(() ->
@@ -44,7 +43,8 @@ public class BookingService {
     }
 
     public Collection<BookingDto> findAllByBooker(Long userId, String stateStr) {
-        BookingState bookingState = BookingState.valueOf(stateStr);
+        BookingState bookingState = Optional.of(BookingState.valueOf(stateStr)).orElseThrow(() ->
+                new NotFoundException("State not exist, value = " + stateStr));
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
         switch (bookingState) {
@@ -78,7 +78,8 @@ public class BookingService {
     }
 
     public Collection<BookingDto> findAllByOwner(Long userId, String stateStr) {
-        BookingState bookingState = BookingState.valueOf(stateStr);
+        BookingState bookingState = Optional.of(BookingState.valueOf(stateStr)).orElseThrow(() ->
+                new NotFoundException("State not exist, value = " + stateStr));
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
         switch (bookingState) {
@@ -111,21 +112,21 @@ public class BookingService {
         }
     }
 
-    public BookingDto create(BookingDto bookingDto, Long userId) {
-        Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow(() ->
-                new NotFoundException("Вещь с id = " + bookingDto.getItemId() + " не найден"));
+    public BookingDto create(CreateBookingDto createBookingDto, Long userId) {
+        Item item = itemRepository.findById(createBookingDto.getItemId()).orElseThrow(() ->
+                new NotFoundException("Вещь с id = " + createBookingDto.getItemId() + " не найден"));
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
         if (!item.getAvailable()) {
             throw new ValidationException("Вещь недоступна для бронирования");
         }
-        if (!bookingRepository.findByItem_IdAndEndIsAfterAndStartIsBefore(item.getId(), BookingMapper.toBooking(bookingDto).getStart(), BookingMapper.toBooking(bookingDto).getEnd()).isEmpty()) {
+        if (!bookingRepository.findByItem_IdAndEndIsAfterAndStartIsBefore(item.getId(), createBookingDto.getStart(), createBookingDto.getEnd()).isEmpty()) {
             throw new ValidationException("Вещь забронирована на данный период");
         }
-
-        bookingDto.setBooker(user);
-        bookingDto.setItem(item);
-        return BookingMapper.toBookingDto(bookingRepository.save(BookingMapper.toBooking(bookingDto)));
+        Booking booking = BookingMapper.toBooking(createBookingDto);
+        booking.setBooker(user);
+        booking.setItem(item);
+        return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
     public BookingDto update(Long userId, Long id, Boolean approved) {

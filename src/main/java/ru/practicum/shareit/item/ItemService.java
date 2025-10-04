@@ -2,9 +2,10 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.comment.CommentRepository;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.comment.dto.CommentMapper;
@@ -19,19 +20,17 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ItemService {
-    @Autowired
-    private ItemRepository itemRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private CommentRepository commentRepository;
-    @Autowired
-    private BookingRepository bookingRepository;
+
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
+    private final BookingRepository bookingRepository;
 
     public ItemDto create(Long userId, ItemDto itemDto) {
 
@@ -65,13 +64,26 @@ public class ItemService {
     }
 
     public Collection<ItemDto> findAll(Long userId) {
-        return itemRepository.findByOwner(userId).stream().map(ItemMapper::toItemDto).toList();
+        List<ItemDto> itemsDto = itemRepository.findByOwner(userId).stream().map(ItemMapper::toItemDto).toList();
+        itemsDto.forEach(itemDto -> {
+            itemDto.setComments(commentRepository.findByItemId(itemDto.getId()).stream().map(Comment::getText).toList());
+            List<BookingDto> bookings = bookingRepository.findByItem_IdAndEndIsBeforeOrderByStartDesc(itemDto.getId(), LocalDateTime.now()).stream().map(BookingMapper::toBookingDto).toList();
+            if (!bookings.isEmpty()) {
+                itemDto.setLastBooking(bookings.getLast());
+            }
+            bookings = bookingRepository.findByItem_IdAndStartIsAfterOrderByStartDesc(itemDto.getId(), LocalDateTime.now()).stream().map(BookingMapper::toBookingDto).toList();
+            if (!bookings.isEmpty()) {
+                itemDto.setNextBooking(bookings.getFirst());
+            }
+        });
+        return itemsDto;
     }
 
     public ItemDto findById(Long id) {
         ItemDto itemDto = ItemMapper.toItemDto(itemRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Вещь с id = " + id + " не найден")));
         itemDto.setComments(commentRepository.findByItemId(id).stream().map(Comment::getText).toList());
+        itemDto.setBookings(bookingRepository.findByItem_IdOrderByStartDesc(itemDto.getId()).stream().map(BookingMapper::toBookingDto).toList());
         return itemDto;
     }
 

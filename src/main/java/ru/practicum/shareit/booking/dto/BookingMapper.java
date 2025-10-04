@@ -2,7 +2,8 @@ package ru.practicum.shareit.booking.dto;
 
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import java.time.LocalDateTime;
+import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.user.dto.UserMapper;
 import java.time.format.DateTimeFormatter;
 
 public class BookingMapper {
@@ -11,11 +12,11 @@ public class BookingMapper {
     public static BookingDto toBookingDto(Booking booking) {
         return new BookingDto(
                 booking.getId(),
-                booking.getStart().format(dateTimeFormater),
-                booking.getEnd().format(dateTimeFormater),
+                booking.getStart(),
+                booking.getEnd(),
                 booking.getItem().getId(),
-                booking.getItem(),
-                booking.getBooker(),
+                ItemMapper.toItemDto(booking.getItem()),
+                UserMapper.toUserDto(booking.getBooker()),
                 booking.getStatus()
         );
     }
@@ -28,10 +29,23 @@ public class BookingMapper {
         }
         return new Booking(
                 bookingDto.getId(),
-                LocalDateTime.parse(bookingDto.getStart(), dateTimeFormater),
-                LocalDateTime.parse(bookingDto.getEnd(), dateTimeFormater),
-                bookingDto.getItem(),
-                bookingDto.getBooker(),
+                bookingDto.getStart(),
+                bookingDto.getEnd(),
+                ItemMapper.toItem(bookingDto.getItem(),null),
+                UserMapper.toUser(bookingDto.getBooker()),
+                bookingStatus
+        );
+    }
+
+    public static Booking toBooking(CreateBookingDto createBookingDto) {
+        BookingStatus bookingStatus = BookingStatus.WAITING;
+
+        return new Booking(
+                createBookingDto.getId(),
+                createBookingDto.getStart(),
+                createBookingDto.getEnd(),
+                null,
+                null,
                 bookingStatus
         );
     }

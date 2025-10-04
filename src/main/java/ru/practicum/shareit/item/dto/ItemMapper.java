@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.dto;
 
 import ru.practicum.shareit.item.model.Item;
-
 import java.util.ArrayList;
 
 public class ItemMapper {
@@ -11,6 +10,7 @@ public class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
+                new ArrayList<>(),
                 new ArrayList<>(),
                 null,
                 null
