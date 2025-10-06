@@ -10,15 +10,19 @@ public class BookingMapper {
     private static final DateTimeFormatter dateTimeFormater = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     public static BookingDto toBookingDto(Booking booking) {
-        return new BookingDto(
-                booking.getId(),
-                booking.getStart(),
-                booking.getEnd(),
-                booking.getItem().getId(),
-                ItemMapper.toItemDto(booking.getItem()),
-                UserMapper.toUserDto(booking.getBooker()),
-                booking.getStatus()
-        );
+        if (booking != null) {
+            return new BookingDto(
+                    booking.getId(),
+                    booking.getStart(),
+                    booking.getEnd(),
+                    booking.getItem().getId(),
+                    ItemMapper.toItemDto(booking.getItem()),
+                    UserMapper.toUserDto(booking.getBooker()),
+                    booking.getStatus()
+            );
+        } else {
+            return null;
+        }
     }
 
     public static Booking toBooking(BookingDto bookingDto) {
@@ -41,7 +45,7 @@ public class BookingMapper {
         BookingStatus bookingStatus = BookingStatus.WAITING;
 
         return new Booking(
-                createBookingDto.getId(),
+                null,
                 createBookingDto.getStart(),
                 createBookingDto.getEnd(),
                 null,

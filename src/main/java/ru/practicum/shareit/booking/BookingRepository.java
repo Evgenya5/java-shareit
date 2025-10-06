@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
@@ -61,8 +62,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByItem_IdOrderByStartDesc(Long itemId);
 
-    List<Booking> findByItem_IdAndEndIsBeforeOrderByStartDesc(Long itemId, LocalDateTime start);
-
-    List<Booking> findByItem_IdAndStartIsAfterOrderByStartDesc(Long itemId, LocalDateTime start);
-
+    @Query(value = "select b.* from bookings as b " +
+            "where b.item_id in :itemIds", nativeQuery = true)
+    List<Booking> findByItem_Ids(Set<Long> itemIds);
 }
