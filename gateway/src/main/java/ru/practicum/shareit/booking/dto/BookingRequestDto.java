@@ -8,11 +8,11 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class BookItemRequestDto {
+public class BookingRequestDto {
 	@NotNull(message = "itemId не может быть пустым")
 	private long itemId;
-	@FutureOrPresent
+	@FutureOrPresent(message = "start не может быть в прошлом")
 	private LocalDateTime start;
-	@Future
+	@Future(message = "end не может быть в прошлом")
 	private LocalDateTime end;
 }

@@ -10,7 +10,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
-import ru.practicum.shareit.booking.dto.BookItemRequestDto;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.client.BaseClient;
 
@@ -28,14 +28,14 @@ public class BookingClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getBookingsByBooker(long userId, BookingState state) {
+    public ResponseEntity<Object> getBookingsByBooker(Long userId, BookingState state) {
         Map<String, Object> parameters = Map.of(
                 "state", state.name()
         );
         return get("?state={state}", userId, parameters);
     }
 
-    public ResponseEntity<Object> getBookingsByOwner(long userId, BookingState state) {
+    public ResponseEntity<Object> getBookingsByOwner(Long userId, BookingState state) {
         Map<String, Object> parameters = Map.of(
                 "state", state.name()
         );
@@ -43,18 +43,18 @@ public class BookingClient extends BaseClient {
     }
 
 
-    public ResponseEntity<Object> createBooking(long userId, BookItemRequestDto requestDto) {
+    public ResponseEntity<Object> createBooking(Long userId, BookingRequestDto requestDto) {
         return post("", userId, requestDto);
     }
 
-    public ResponseEntity<Object> updateBooking(long userId, Long id, Boolean approved) {
+    public ResponseEntity<Object> updateBooking(Long userId, Long id, Boolean approved) {
         Map<String, Object> parameters = Map.of(
                 "approved", approved
         );
         return patch("/" + id + "?approved={approved}", userId, parameters, null);
     }
 
-    public ResponseEntity<Object> getBooking(long userId, Long bookingId) {
+    public ResponseEntity<Object> getBooking(Long userId, Long bookingId) {
         return get("/" + bookingId, userId);
     }
 }
