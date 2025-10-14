@@ -1,4 +1,4 @@
-package validateDto;
+package ru.practicum.shareit.dto;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

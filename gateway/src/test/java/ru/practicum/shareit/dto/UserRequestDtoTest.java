@@ -1,4 +1,4 @@
-package validateDto;
+package ru.practicum.shareit.dto;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -6,6 +6,7 @@ import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
+import ru.practicum.shareit.user.dto.UserRequestDto;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
