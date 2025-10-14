@@ -10,9 +10,11 @@ import lombok.Getter;
 @Getter
 public class BookingRequestDto {
 	@NotNull(message = "itemId не может быть пустым")
-	private long itemId;
+	private Long itemId;
 	@FutureOrPresent(message = "start не может быть в прошлом")
+	@NotNull(message = "start date не может быть пустым")
 	private LocalDateTime start;
-	@Future(message = "end не может быть в прошлом")
+	@Future(message = "end date не может быть в прошлом")
+	@NotNull(message = "end date не может быть пустым")
 	private LocalDateTime end;
 }

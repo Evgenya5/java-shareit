@@ -23,7 +23,7 @@ public class BookingController {
 			@RequestParam(name = "state", defaultValue = "ALL") String stateParam) {
 		BookingState state = BookingState.from(stateParam)
 				.orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
-		//log.info("Get booking with state {}, userId={}", stateParam, userId);
+		log.info("Get booking with state {}, userId={}", stateParam, userId);
 		return bookingClient.getBookingsByBooker(userId, state);
 	}
 
@@ -32,26 +32,26 @@ public class BookingController {
 													  @RequestParam(name = "state", defaultValue = "ALL") String stateParam) {
 		BookingState state = BookingState.from(stateParam)
 				.orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
-		//log.info("Get booking with state {}, userId={}", stateParam, userId);
+		log.info("Get booking with state {}, userId={}", stateParam, userId);
 		return bookingClient.getBookingsByOwner(userId, state);
 	}
 
 	@PostMapping
 	public ResponseEntity<Object> createBooking(@RequestHeader("X-Sharer-User-Id") long userId,
 			@RequestBody @Valid BookingRequestDto requestDto) {
-		//log.info("Creating booking {}, userId={}", requestDto, userId);
+		log.info("Creating booking {}, userId={}", requestDto, userId);
 		return bookingClient.createBooking(userId, requestDto);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> getBooking(@RequestHeader("X-Sharer-User-Id") long userId,
 			@PathVariable Long id) {
-		//log.info("Get booking {}, userId={}", id, userId);
+        log.info("Get booking {} userId = {}", id, userId);
 		return bookingClient.getBooking(userId, id);
 	}
 
 	@PatchMapping("/{id}")
-	public ResponseEntity<Object> update(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long id, @RequestParam Boolean approved) {
+	public ResponseEntity<Object> update(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long id, @RequestParam(required = true) Boolean approved) {
 		return bookingClient.updateBooking(userId, id, approved);
 	}
 }

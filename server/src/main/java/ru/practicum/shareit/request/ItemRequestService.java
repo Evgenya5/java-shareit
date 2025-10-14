@@ -45,7 +45,6 @@ public class ItemRequestService {
         Map<Long, ItemRequestDto> itemReqMap = itemRequestRepository.findByRequestor_IdOrderByCreatedDesc(userId).stream()
                 .map(ItemRequestMapper::toItemRequestDto)
                 .collect(Collectors.toMap(ItemRequestDto::getId, Function.identity()));
-        log.error(itemReqMap.keySet().toString());
         Map<Long, List<Item>> itemMap = itemRepository.findByRequest_Ids(itemReqMap.keySet())
                 .stream()
                 .collect(Collectors.groupingBy(Item::getRequest));
@@ -58,8 +57,16 @@ public class ItemRequestService {
     public Collection<ItemRequestDto> findAll(Long userId) {
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
-        return itemRequestRepository.findAll().stream().filter(itemRequest -> !Objects.equals(itemRequest.getRequestor().getId(), userId)).map(ItemRequestMapper::toItemRequestDto).toList();
-    }
+        Map<Long, ItemRequestDto> itemReqMap = itemRequestRepository.findAll().stream()
+                .map(ItemRequestMapper::toItemRequestDto)
+                .collect(Collectors.toMap(ItemRequestDto::getId, Function.identity()));
+        Map<Long, List<Item>> itemMap = itemRepository.findByRequest_Ids(itemReqMap.keySet())
+                .stream()
+                .collect(Collectors.groupingBy(Item::getRequest));
+        return itemReqMap.values()
+                .stream()
+                .map(itemReqDto -> makeItemReqWithItems(itemReqDto, itemMap.getOrDefault(itemReqDto.getId(), Collections.emptyList())))
+                .toList();}
 
     public ItemRequestDto create(CreateItemRequestDto createItemRequestDto, Long userId) {
 
