@@ -6,8 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.UserService;
-
 import java.util.Arrays;
 import java.util.Collection;
 
