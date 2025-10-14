@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.exception.ValidateEmailException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -30,6 +30,10 @@ public class UserService {
 
     public UserDto create(UserDto userDto) {
 
+        if (!userRepository.findByEmail(userDto.getEmail()).isEmpty()) {
+            log.error("email exist");
+            throw new ValidateEmailException("электронная почта уже зарегитрирована под пользователем");
+        }
         // формируем дополнительные данные
         return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
@@ -39,11 +43,10 @@ public class UserService {
         User oldUser = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
         // если найдена и все условия соблюдены, обновляем её содержимое
-
         if (userDto.getEmail() != null) {
-            if (userDto.getEmail().isBlank() || !userDto.getEmail().contains("@")) {
-                log.error("not valid email");
-                throw new ValidationException("электронная почта не может быть пустой и должна содержать символ @");
+            if (!userRepository.findByEmail(userDto.getEmail()).isEmpty()) {
+                log.error("email exist");
+                throw new ValidateEmailException("электронная почта уже зарегитрирована под пользователем");
             }
             oldUser.setEmail(userDto.getEmail());
         }

@@ -59,10 +59,10 @@ public class ItemService {
     }
 
     public void delete(Long itemId) {
-        if (itemId == null) {
+        /*if (itemId == null) {
             log.error("user id empty");
             throw new ValidationException("Id должен быть указан");
-        }
+        }*/
         itemRepository.delete(itemRepository.findById(itemId).get());
     }
 

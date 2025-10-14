@@ -15,12 +15,10 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -43,8 +41,9 @@ public class BookingService {
     }
 
     public Collection<BookingDto> findAllByBooker(Long userId, String stateStr) {
-        BookingState bookingState = Optional.of(BookingState.valueOf(stateStr)).orElseThrow(() ->
-                new NotFoundException("State not exist, value = " + stateStr));
+        /*BookingState bookingState = Optional.of(BookingState.valueOf(stateStr)).orElseThrow(() ->
+                new NotFoundException("State not exist, value = " + stateStr));*/
+        BookingState bookingState = BookingState.valueOf(stateStr);
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
         switch (bookingState) {
@@ -78,8 +77,9 @@ public class BookingService {
     }
 
     public Collection<BookingDto> findAllByOwner(Long userId, String stateStr) {
-        BookingState bookingState = Optional.of(BookingState.valueOf(stateStr)).orElseThrow(() ->
-                new NotFoundException("State not exist, value = " + stateStr));
+        /*BookingState bookingState = Optional.of(BookingState.valueOf(stateStr)).orElseThrow(() ->
+                new NotFoundException("State not exist, value = " + stateStr));*/
+        BookingState bookingState = BookingState.valueOf(stateStr);
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
         switch (bookingState) {
