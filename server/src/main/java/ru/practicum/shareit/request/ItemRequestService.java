@@ -66,7 +66,8 @@ public class ItemRequestService {
         return itemReqMap.values()
                 .stream()
                 .map(itemReqDto -> makeItemReqWithItems(itemReqDto, itemMap.getOrDefault(itemReqDto.getId(), Collections.emptyList())))
-                .toList();}
+                .toList();
+    }
 
     public ItemRequestDto create(CreateItemRequestDto createItemRequestDto, Long userId) {
 
