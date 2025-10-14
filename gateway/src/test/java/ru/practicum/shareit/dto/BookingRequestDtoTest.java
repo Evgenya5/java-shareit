@@ -7,8 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
-import ru.practicum.shareit.item.dto.ItemRequestDto;
-
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
