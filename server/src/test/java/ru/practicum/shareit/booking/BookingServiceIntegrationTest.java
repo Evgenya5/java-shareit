@@ -109,7 +109,6 @@ class BookingServiceIntegrationTest {
         booking.setItem(availableItem);
         booking.setBooker(booker);
         Booking savedBooking = bookingRepository.save(booking);
-
         BookingDto result = bookingService.update(owner.getId(), savedBooking.getId(), true);
 
         assertNotNull(result);
