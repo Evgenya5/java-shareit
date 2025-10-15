@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidateEmailException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -81,6 +82,20 @@ class UserServiceUnitTest {
     }
 
     @Test
+    void create_emailExist() {
+        UserDto requestDto = UserDto.builder()
+                .name("name")
+                .email("test@mail.ru")
+                .build();
+
+        User user = UserMapper.toUser(requestDto);
+        when(userRepository.findByEmail("test@mail.ru")).thenReturn(List.of(user));
+        assertThrows(ValidateEmailException.class, () -> userService.create(requestDto));
+        verify(userRepository, times(0)).save(user);
+        verify(userRepository, times(1)).findByEmail("test@mail.ru");
+    }
+
+    @Test
     void update() {
         UserDto requestDto = UserDto.builder()
                 .name("name")
@@ -97,6 +112,22 @@ class UserServiceUnitTest {
         verify(userRepository, times(1)).findById(1L);
         verify(userRepository, times(1)).save(user);
         verify(userRepository, times(1)).findByEmail("test@mail.ru");
+    }
+
+    @Test
+    void update_emailExist() {
+        UserDto requestDto = UserDto.builder()
+                .name("name")
+                .email("test@mail.ru")
+                .build();
+
+        User user = UserMapper.toUser(requestDto);
+        when(userRepository.findByEmail("test@mail.ru")).thenReturn(List.of(user));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        assertThrows(ValidateEmailException.class, () -> userService.update(1L, requestDto));
+        verify(userRepository, times(0)).save(user);
+        verify(userRepository, times(1)).findByEmail("test@mail.ru");
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test

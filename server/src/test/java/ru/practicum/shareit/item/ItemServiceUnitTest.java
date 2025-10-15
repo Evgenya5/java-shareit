@@ -19,10 +19,12 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,7 +67,6 @@ class ItemServiceUnitTest {
         assertNotNull(result);
         assertEquals(result, requestDto);
         verify(itemRepository, times(1)).save(item);
-
         verify(userRepository, times(1)).findById(1L);
     }
 
@@ -169,10 +170,29 @@ class ItemServiceUnitTest {
 
     @Test
     void delete() {
+        Item item = new Item();
+        item.setId(1L);
+
+        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
+        itemService.delete(1L);
+        verify(itemRepository, times(1)).findById(1L);
+        verify(itemRepository, times(1)).delete(item);
     }
 
     @Test
     void findAll() {
+        Item item1 = new Item();
+        item1.setId(1L);
+        item1.setOwner(1L);
+        Item item2 = new Item();
+        item2.setOwner(1L);
+        item2.setId(2L);
+        List<Item> items = Arrays.asList(item1, item2);
+        when(itemRepository.findByOwner(1L)).thenReturn(items);
+        List<Item> result = itemService.findAll(1L).stream().map(dto -> ItemMapper.toItem(dto,1L)).toList();
+        assertNotNull(result);
+        assertEquals(result, items);
+        verify(itemRepository, times(1)).findByOwner(1L);
     }
 
     @Test
@@ -201,6 +221,18 @@ class ItemServiceUnitTest {
 
     @Test
     void searchByText() {
+        Item item1 = new Item();
+        item1.setId(1L);
+        item1.setOwner(1L);
+        Item item2 = new Item();
+        item2.setOwner(1L);
+        item2.setId(2L);
+        List<Item> items = Arrays.asList(item1, item2);
+        when(itemRepository.findByText("text")).thenReturn(items);
+        List<Item> result = itemService.searchByText("text").stream().map(dto -> ItemMapper.toItem(dto,1L)).toList();
+        assertNotNull(result);
+        assertEquals(result, items);
+        verify(itemRepository, times(1)).findByText("text");
     }
 
     @Test
