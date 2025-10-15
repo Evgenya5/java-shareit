@@ -41,8 +41,8 @@ public class ItemClient extends BaseClient {
         return post("/" + id + "/comment", userId, requestDto);
     }
 
-    public ResponseEntity<Object> getItem(Long userId) {
-        return get("/" + userId);
+    public ResponseEntity<Object> getItem(Long id) {
+        return get("/" + id);
     }
 
     public ResponseEntity<Object> itemUpdate(Long id, Long userId, ItemRequestDto requestDto) {
