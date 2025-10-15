@@ -1,6 +1,8 @@
-package ru.practicum.shareit.booking.dto;
+package ru.practicum.shareit.dto;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import ru.practicum.shareit.booking.dto.BookingState;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -8,7 +10,7 @@ class BookingStateTest {
 
     @Test
     void fromCorrectValueAll() {
-        assertTrue(BookingState.from("ALL").isPresent());
+        Assertions.assertTrue(BookingState.from("ALL").isPresent());
     }
 
     @Test
