@@ -19,8 +19,6 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 
-//import static org.assertj.core.api.Assertions.assertThat;
-
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
@@ -67,7 +65,7 @@ class BookingServiceIntegrationTest {
     }
 
     @Test
-    void createBooking_WithValidData_ShouldCreateBooking() {
+    void createBooking() {
         CreateBookingDto bookingRequest = CreateBookingDto.builder()
                 .itemId(availableItem.getId())
                 .start(LocalDateTime.now().plusDays(1))

@@ -41,8 +41,7 @@ public class BookingService {
     }
 
     public Collection<BookingDto> findAllByBooker(Long userId, String stateStr) {
-        /*BookingState bookingState = Optional.of(BookingState.valueOf(stateStr)).orElseThrow(() ->
-                new NotFoundException("State not exist, value = " + stateStr));*/
+
         BookingState bookingState = BookingState.valueOf(stateStr);
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
@@ -77,8 +76,7 @@ public class BookingService {
     }
 
     public Collection<BookingDto> findAllByOwner(Long userId, String stateStr) {
-        /*BookingState bookingState = Optional.of(BookingState.valueOf(stateStr)).orElseThrow(() ->
-                new NotFoundException("State not exist, value = " + stateStr));*/
+
         BookingState bookingState = BookingState.valueOf(stateStr);
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
