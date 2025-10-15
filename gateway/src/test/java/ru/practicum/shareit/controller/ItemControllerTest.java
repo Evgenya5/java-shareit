@@ -1,5 +1,8 @@
 package ru.practicum.shareit.controller;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -7,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 import ru.practicum.shareit.item.ItemClient;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
@@ -24,11 +28,15 @@ class ItemControllerTest {
     @Mock
     private ItemClient itemClient;
 
+    private Validator validator;
+
     @InjectMocks
     private ItemController itemController;
 
     @BeforeEach
     public void beforeEach() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
         MockitoAnnotations.openMocks(this);
     }
 
@@ -43,6 +51,18 @@ class ItemControllerTest {
     }
 
     @Test
+    void itemCreateNotValid() {
+        ItemRequestDto item = new ItemRequestDto();
+        ResponseEntity<Object> response = new ResponseEntity<>(item, HttpStatusCode.valueOf(200));
+        when(itemClient.itemCreate(1L, item)).thenReturn(response);
+        var violations = validator.validate(item);
+        assertFalse(violations.isEmpty());
+        ResponseEntity<Object> result = itemController.itemCreate(1L, item);
+        assertEquals(response, result);
+        verify(itemClient, times(1)).itemCreate(1L, item);
+    }
+
+    @Test
     void createComment() {
         CommentRequestDto commentRequestDto = mock(CommentRequestDto.class);
         ResponseEntity<Object> response = new ResponseEntity<>(commentRequestDto, HttpStatusCode.valueOf(200));
@@ -50,7 +70,16 @@ class ItemControllerTest {
         ResponseEntity<Object> result = itemController.createComment(1L, 1L, commentRequestDto);
         assertEquals(response, result);
         verify(itemClient, times(1)).createComment(1L, 1L, commentRequestDto);
+    }
 
+    @Test
+    void createCommentNotExistItemId() {
+        CommentRequestDto commentRequestDto = mock(CommentRequestDto.class);
+        ResponseEntity<Object> response = new ResponseEntity<>(new Object(), HttpStatusCode.valueOf(404));
+        when(itemClient.createComment(1L, 10000L, commentRequestDto)).thenReturn(response);
+        ResponseEntity<Object> result = itemController.createComment(1L, 10000L, commentRequestDto);
+        assertEquals(response, result);
+        verify(itemClient, times(1)).createComment(1L, 10000L, commentRequestDto);
     }
 
     @Test
@@ -61,6 +90,16 @@ class ItemControllerTest {
         ResponseEntity<Object> result = itemController.findById(1L);
         assertEquals(response, result);
         verify(itemClient, times(1)).getItem(1L);
+    }
+
+    @Test
+    void findByIdNotExist() {
+        ItemRequestDto item = mock(ItemRequestDto.class);
+        ResponseEntity<Object> response = new ResponseEntity<>(new Object(), HttpStatusCode.valueOf(404));
+        when(itemClient.getItem(100000L)).thenReturn(response);
+        ResponseEntity<Object> result = itemController.findById(100000L);
+        assertEquals(response, result);
+        verify(itemClient, times(1)).getItem(100000L);
     }
 
     @Test
