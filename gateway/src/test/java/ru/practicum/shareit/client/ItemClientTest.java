@@ -22,6 +22,9 @@ class ItemClientTest {
     @Mock
     ItemClient itemClient;
 
+    @Mock
+    BaseClient baseClient;
+
     @BeforeEach
     public void beforeEach() {
         MockitoAnnotations.openMocks(this);
@@ -79,6 +82,7 @@ class ItemClientTest {
         ItemRequestDto item = mock(ItemRequestDto.class);
         ResponseEntity<Object> response = new ResponseEntity<>(item, HttpStatusCode.valueOf(200));
         when(itemClient.getItem(1L)).thenReturn(response);
+        when(baseClient.get("/" + 1L)).thenReturn(response);
         ResponseEntity<Object> result = itemClient.getItem(1L);
         assertEquals(response, result);
         verify(itemClient, times(1)).getItem(1L);
