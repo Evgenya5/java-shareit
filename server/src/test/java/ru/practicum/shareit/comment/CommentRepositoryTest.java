@@ -58,8 +58,6 @@ class CommentRepositoryTest {
         assertThat(result.getAuthor()).isNotNull();
     }
 
-
-
     private User createUser(String email, String name) {
         User user = new User();
         user.setEmail(email);
