@@ -1,0 +1,52 @@
+package ru.practicum.shareit.item.dto;
+
+import ru.practicum.shareit.item.model.Item;
+
+import java.util.ArrayList;
+
+public class ItemMapper {
+    public static ItemDto toItemDto(Item item) {
+        return new ItemDto(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                item.getRequest(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                null,
+                null
+        );
+    }
+
+    public static ItemForRequestDto toItemForReqDto(Item item) {
+        return new ItemForRequestDto(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getOwner()
+        );
+    }
+
+    public static Item toItem(ItemDto itemDto, Long userId) {
+        return new Item(
+                itemDto.getId(),
+                itemDto.getName(),
+                itemDto.getDescription(),
+                itemDto.getAvailable(),
+                userId,
+                itemDto.getRequest()
+        );
+    }
+
+    public static Item toItem(CreateItemDto itemDto, Long userId) {
+        return new Item(
+                null,
+                itemDto.getName(),
+                itemDto.getDescription(),
+                itemDto.getAvailable(),
+                userId,
+                itemDto.getRequestId()
+        );
+    }
+}
